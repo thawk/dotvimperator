@@ -1,0 +1,347 @@
+" 参考https://github.com/azuwis/.pentadactyl
+" http://www.slimeden.com/2011/03/firefox/pentadactyl
+
+" Options {{{
+    set gui=none
+    " bookmark bar
+    set gui=bookmarks
+    set gui=tabs
+    " tab number
+    set tabnumbers
+    " 使用Suggest补全
+    set complete+=S
+    " 用独立行显示提示信息
+    "set go+=M   
+    "set nextpattern^='^((下|下一)(页|张|章|篇))','((下|下一)(页|张|章|篇))$','^\u203A\u203A$'
+    "set nextpattern^='[下后]一?[頁页张个篇章节]','\bolder\s*(posts|entries)\b','^\u203A\u203A$'
+    " 先找“下一页”，再找“后一页”，以免出现“最后一页”比“下一页”更优先的情况
+    set nextpattern^='下一?[頁页张个篇章节]','后一?[頁页张个篇章节]','\bolder\s*(posts|entries)\b','^\u203A\u203A$'
+    "set previouspattern^='^((上|上一)(页|张|章|篇))','((上|上一)(页|张|章|篇))$','^\u2039\u2039$'
+    set previouspattern^='[上前]一?[頁页张个篇章节]','\bnewer\s*(posts|entries)\b','^\u2039\u2039$'
+    "set mapleader=','
+    " 用|或空白字符（包括换行）作为URL的分隔符
+    "set urlseparator='(\||\s+)'
+
+    "if config.OS.isWindows
+    "    set editor='gvim + -f +<line> +"sil! call cursor(0, <column>)" <file>'
+    "else
+    "    set editor='xerm -e vim + -f +<line> +"sil! call cursor(0, <column>)" <file>'
+    "endif
+" }}}
+
+" Auto passthrought {{{
+    " Auto enter passthrought mode
+    ignorekeys add mail\.google\.com
+    ignorekeys add www\.google\.com/reader/
+    ignorekeys add docs\.google\.com/
+    ignorekeys add plus\.google\.com/
+    ignorekeys add www\.rememberthemilk\.com
+    ignorekeys add twitter\.com
+    ignorekeys add chrome://epubreader/
+    ignorekeys add jsfiddle\.net
+    ignorekeys add trello.com
+    ignorekeys add www\.toodledo\.com/tasks
+    ignorekeys add outline.toodledo.com
+    ignorekeys add drive\.google\.com/keep
+" }}}
+
+" Firefox Hacks {{{
+    " Disable extension compatibility check {{{
+        set! extensions.checkCompatibility=false
+        style -name=addons-version addons.mozilla.org <<EOF
+            /* Show the install button for extensions for older versions of Firefox */
+            .install-container { display: block !important; }
+            .exp-loggedout > .install-button { display: none !important }
+EOF
+    " }}}
+
+    " Disable the install-dialog delay {{{
+        set! security.dialog_enable_delay=0
+    " }}}
+" }}}
+
+" Mappings {{{
+    map ,et :echo buffer.title<CR>
+    map ,eu :echo buffer.URL<CR>
+
+    " press ,s to search current selection
+    map ,s :exe ":tabopen google "+content.getSelection()<cr>
+
+    " 快速改变编码
+    map ,eu :set encoding=UTF-8<cr>
+    map ,eg :set encoding=GB2312<cr>
+
+    " Go to prev and next tab
+    "map q gT
+    "map w gt
+
+    " Move current tab
+    "map Q :tabmove! -1<cr>
+    "map W :tabmove! +1<cr>
+
+    " Toggle the toolbar
+    map <C-Up> :se go+=T<cr>
+    map <C-Down> :se go-=T<cr>
+
+    " Scroll more lines
+    nnoremap j 5j
+    nnoremap k 5k
+" }}}
+
+" Plugin settings (before loading) {{{
+    " copy.js {{{
+    "map <silent> ,y :js liberator.clipboardWrite(content.document.title, true)<cr>
+    js <<EOM
+        options.copy_templates = [
+            { label: 'titleAndURL',    value: '%TITLE%\n%URL%', map: ',Y'},
+            { label: 'title',          value: '%TITLE%', map: ',y'},
+            { label: 'anchor',         value: '<a href="%URL%">%TITLE%</a>' },
+            { label: 'selanchor',      value: '<a href="%URL%" title="%TITLE%">%SEL%</a>' },
+            { label: 'htmlblockquote', value: '<blockquote cite="%URL%" title="%TITLE%">%HTMLSEL%</blockquote>' }
+        ];
+EOM
+    " }}}
+
+    " uaSwitchLite.js {{{
+    javascript <<EOM
+        liberator.globalVariables.useragent_list = [
+        {
+          description: 'Internet Explorer 7 (Windows Vista)',
+          useragent: 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0)',
+          appname: 'Microsoft Internet Explorer',
+          appversion: '4.0 (compatible; MSIE 7.0; Windows NT 6.0)',
+          platform: 'Win32',
+        }, {
+          description: 'Netscape 4.8 (Windows Vista)',
+          useragent: 'Mozilla/4.8 [en] (Windows NT 6.0; U)',
+          appname: 'Netscape',
+          appversion: '4.8 [en] (Windows NT 6.0; U)',
+          platform: 'Win32',
+        }, {
+          description: "Android",
+          useragent: "Mozilla/5.0 (Linux; U; Android 2.2; en-us; Nexus One Build/FRF91) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1",
+          appname: '',
+          appversion: '',
+          platform: '',
+        }, {
+          description: "iPhone",
+          useragent: "Mozilla/5.0 (iPad; U; CPU OS 3_2_2 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) Version/4.0.4 Mobile/7B500 Safari/531.21.10",
+          appname: '',
+          appversion: '',
+          platform: '',
+        }, {
+          description: "Nokia N97",
+          useragent: "Mozilla/5.0 (SymbianOS/9.4; Series60/5.0 NokiaN97-1/20.0.019; Profile/MIDP-2.1 Configuration/CLDC-1.1) AppleWebKit/525 (KHTML, like Gecko) BrowserNG/7.1.18124",
+          appname: '',
+          appversion: '',
+          platform: '',
+        }, {
+          description: 'Google',
+          useragent: 'Googlebot/2.1 (+http://www.google.com/bot.html)',
+          appname: '',
+          appversion: '',
+          platform: '',
+        }];
+EOM
+    " }}}
+
+    " nextlink.js {{{
+    let g:nextlink_nositeinfo_act = "f"
+    let g:nextlink_followlink = "true"
+    " }}}
+" }}}
+
+" Load all plugins
+loadplugins
+
+" Plugin settings (After loading) {{{
+
+    " chinese-hints {{{ 启用五笔搜索
+    " 如果使用拼音的话，可不设置chinesehints或设置为pinyin
+    set hintmatching=custom chinesehints=wubi
+    " }}}
+
+" }}}
+
+" LookupDictionary {{{
+javascript <<EOM
+liberator.globalVariables.lookupDictionary_site_definition =
+[{
+    names: ['answers'],
+    url: 'http://www.answers.com/%s',
+    shortHelp: 'Answers.com(\u82F1\u82F1\u8F9E\u66F8)',
+    xpath: 'id("firstDs")',
+    dictionary: 'en-US'
+},{
+    names: ['wikipe[diaen]'],
+    url: 'http://en.wikipedia.org/wiki/%s',
+    shortHelp: 'Wikipedia lite(en)',
+    xpath: 'id("bodyContent")/p[1]',
+    dictionary: 'en'
+},{
+    names: ['youdao'],
+    url: 'http://dict.youdao.com/search?q=%s&keyfrom=dict.index#q%3D%s%26keyfrom%3Ddict.index',
+    shortHelp: '有道词典',
+    xpath: 'id("phrsListTab")',
+    dictionary: 'zh-CN'
+}];
+EOM
+" }}}
+
+"" {{{ Searching
+"" from http://www.slimeden.com/2011/03/firefox/pentadactyl
+
+" 重定义t和o：如果有文字链接被选中，则直接打开链接；如果被选中的是一般文字，则用默认搜索引擎搜索；
+" 否则打开:tabopen或者:open命令行，手动输入关键字搜索。
+"map t :javascript content.window.getSelection().toString()!=""?liberator.execute(":tabopen "+ content.window.getSelection()):CommandExMode().open("tabopen ")
+"map o :javascript content.window.getSelection().toString()!=""?liberator.execute(":open "+ content.window.getSelection()):CommandExMode().open("open ")
+
+" 按了s后就能自己输入搜索引擎关键字（当然也可以在自动补全菜单里选择），
+" 如果不选直接回车就是用默认引擎（对于选中的恰好是链接的情况则是直接打开链接） 
+command! -nargs=* -complete=search search javascript execute 'tabopen <args> ' + content.getSelection().toString()
+map s :search<Space>
+
+" 映射键S：在某个搜索引擎结果页面按S键，会弹出引擎列表，选中引擎直接更换引擎用当前搜索的内容重新搜索。
+command! -nargs=? -complete=search switchSearch execute 'open <args> ' + (buffer.lastInputField?buffer.lastInputField.value:'')
+noremap S gi<ESC> :switchSearch<Space>
+command! -nargs=* siteSearch execute "tabopen <args> site:" + window.content.location.hostname
+
+"" search engines
+"" hide all browser search engines except google(for suggestion)
+"js services.browserSearch.getEngines().forEach(function (e) {if(e.name!="Google") e.hidden = true})
+silent bmark -tags searchengine -folder searchengine -keyword g -title='Google SSL Search' https://www.google.com/search?q=%s&lr=lang_zh-CN|lang_zh-TW|lang_en
+silent bmark -tags searchengine -folder searchengine -keyword gc -title='Google Code Search' http://google.com/codesearch?q=%s
+silent bmark -tags searchengine -folder searchengine -keyword b -title='Bing Search' http://cn.bing.com/search?q=%s
+silent bmark -tags searchengine -folder searchengine -keyword w -title='Wikipedia Search' http://en.wikipedia.org/wiki/Special:Search?search=%s
+silent bmark -tags searchengine -folder searchengine -keyword t -title='Twitter Search' https://twitter.com/search/%s
+silent bmark -tags searchengine -folder searchengine -keyword d -title='Debian Package Search' http://packages.debian.org/search?keywords=%s
+silent bmark -tags searchengine -folder searchengine -keyword df -title='Debian File Search' http://packages.debian.org/search?searchon=contents&mode=exactfilename&keywords=%s
+silent bmark -tags searchengine -folder searchengine -keyword m -title='Mtime Movie Search' http://search.mtime.com/search/?%s
+silent bmark -tags searchengine -folder searchengine -keyword dm -title='Douban Movie Search' http://movie.douban.com/subject_search?search_text=%s&cat=1002
+silent bmark -tags searchengine -folder searchengine -keyword s -title='Shooter Subtitle Search' http://shooter.cn/search/%s
+silent bmark -tags searchengine -folder searchengine -keyword baidu -title='Baidu Search' -charset=GB2312 http://www.baidu.com/s?wd=%s&rsv_bp=0&rsv_spt=3
+silent bmark -tags searchengine -folder searchengine -keyword k -title='KTXP Torrent Search' http://bt.ktxp.com/search.php?keyword=%s
+silent bmark -tags searchengine -folder searchengine -keyword c -title='CHDBits Search' http://chdbits.org/torrents.php?incldead=1&spstate=0&inclbookmarked=0&search=%s&search_area=0&search_mode=0
+silent bmark -tags searchengine -folder searchengine -keyword bm -title='Baidu MP3 Search' -charset=GB2312 http://mp3.baidu.com/m?f=ms&rf=idx&tn=baidump3&ct=134217728&lf=&rn=&word=%s&lm=-1
+silent bmark -tags searchengine -folder searchengine -keyword mo -title='Mobilism' http://forum.mobilism.org/search.php?keywords=%s&fid[]=398&sc=1&sr=topics&sf=titleonly
+silent bmark -tags searchengine -folder searchengine -keyword cpp -title='CPlusPlus' http://www.cplusplus.com/search.do?q=%s
+silent bmark -tags searchengine -folder searchengine -keyword bd -title='必应词典' http://cn.bing.com/dict/search?q=%s
+
+silent bmark -tags searchengine -folder searchengine bugmenot http://www.bugmenot.com/view.php?url=%s
+silent bmark -tags searchengine -folder searchengine whois http://www.whois.net/whois_new.cgi?d=%s&tld=com
+silent bmark -tags searchengine -folder searchengine lookup http://network-tools.com/default.asp?prog=lookup&host=%s
+silent bmark -tags searchengine -folder searchengine ping http://network-tools.com/default.asp?prog=ping&host=%s
+silent bmark -tags searchengine -folder searchengine traceroute http://network-tools.com/default.asp?prog=trace&host=%s
+
+set defsearch=g
+"" }}}
+
+"" {{{ Command
+"" smart reload
+"command! smartReload -js <<EOF
+"if (buffer.URL.spec.indexOf('#') >= 0) {
+"    liberator.execute("reload");
+"} else {
+"    liberator.open(buffer.URL.spec);
+"}
+"EOF
+"nmap -builtin r :smartReload<CR>
+
+javascript <<EOM
+commands.addUserCommand(
+    ['smartReader'], 'Read current page with clearly or other readers',
+    function(){
+        if (typeof __readable_by_evernote === "object") {
+            //liberator.execute("emenu Tools.Clearly"); 
+            __readable_by_evernote.readable_by_evernote__menu__call(buffer.URL)
+        } else if (typeof FirefoxReader === "object") {
+            liberator.execute("feedkeys <M-A-z>"); 
+        } else if (typeof commands.get("readability") === "object") {
+            liberator.execute("readability"); 
+        } else {
+            liberator.execute("bml-readability"); 
+        }
+    })
+EOM
+nmap <Leader>r :smartReader<CR>
+
+
+"" flush browser dns
+command! flushdns set! network.dnsCacheExpiration=0 | set! network.dnsCacheExpiration&
+
+command! gohttps javascript if (buffer.URL.indexOf('http://') === 0) { liberator.open(String.replace(buffer.URL, /^http/i, 'https')); } else if (buffer.URL.indexOf('https://') === 0) { liberator.open(String.replace(buffer.URL, /^https/i, 'http')); }
+nmap gs :gohttps<CR>
+
+"" display calendar
+command! cal javascript liberator.echo(<datepicker type="grid" xmlns={XUL}/>)
+
+"" toggle高亮
+command! hl set hlf!
+
+"" }}}
+
+" Themes {{{
+    "colorscheme zenburn
+    "colorscheme myzenburn
+    "colorscheme simple_dark
+    colorscheme solarized
+" }}}
+
+" Styles {{{
+    " 在命令行上禁用输入法
+    style -name commandline-ime chrome://* #liberator-commandline-command input {ime-mode: inactive;}
+
+    " Buftab styling {{{
+    "    hi -a BufTabSelected        color:#2e3330; background-color:#88b090; padding:0 4px;
+    "    hi -a BufTabs               margin:0 4px; overflow:hidden;
+    "    hi -a BufTab                padding:0 2px;
+    " }}}
+
+    " Hint font size {{{
+        hi Hint font-family: monospace; font-size: 10px; font-weight: normal; color: white; padding: 1px 3px; background: #744E7A;
+        hi HintElem background-color: #8FAF9F; color: #000D18; 
+        hi HintActive background: #F18C96; color: #333333;
+        hi Hint[active] background: green;
+    " }}}
+
+    " Display the tabbar at the bottom {{{
+    " style chrome://* #content > tabbox { -moz-box-direction: reverse !important; }
+    " }}}
+
+    " Italic text in not seen tabs {{{
+    "    style chrome://* #content tab:not([selected]) { font-style: italic !important; } 
+    " }}}
+
+" }}}
+
+" Quickmarks {{{
+    " r for Readable {{{
+        "silent qmark r javascript:(function(){_readableOptions={'text_font':'Tinos','text_font_monospace':'quote(Courier%20New),%20Courier,%20monospace','text_font_header':'quote(Palatino%20Linotype),%20Palatino,%20quote(Book%20Antigua),%20Georgia,%20serif','text_size':'22px','text_line_height':'1.5','box_width':'40em','color_text':'#FDFDFD','color_background':'#343A3A','color_links':'#99CCFF','text_align':'normal','base':'blueprint','custom_css':''};if(document.getElementsByTagName('body').length>0);else{return;}if(window.$readable){if(window.$readable.bookmarkletTimer){return;}}else{window.$readable={};}window.$readable.bookmarkletTimer=true;window.$readable.options=_readableOptions;if(window.$readable.bookmarkletClicked){window.$readable.bookmarkletClicked();return;}_readableScript=document.createElement('script');_readableScript.setAttribute('src','http://readable-static.tastefulwords.com/target.js?rand='+encodeURIComponent(Math.random()));document.getElementsByTagName('body')[0].appendChild(_readableScript);})()
+        "silent qmark r javascript:(function(){_readableOptions={'text_font':'Tinos','text_font_monospace':'quote(Courier%20New),%20Courier,%20monospace','text_font_header':'quote(Palatino%20Linotype),%20Palatino,%20quote(Book%20Antigua),%20Georgia,%20serif','text_size':'22px','text_line_height':'1.5','box_width':'40em','color_text':'#839496','color_background':'#002b36','color_links':'#268bd2','text_align':'normal','base':'blueprint','custom_css':''};if(document.getElementsByTagName('body').length>0);else{return;}if(window.$readable){if(window.$readable.bookmarkletTimer){return;}}else{window.$readable={};}window.$readable.bookmarkletTimer=true;window.$readable.options=_readableOptions;if(window.$readable.bookmarkletClicked){window.$readable.bookmarkletClicked();return;}_readableScript=document.createElement('script');_readableScript.setAttribute('src','http://readable-static.tastefulwords.com/target.js?rand='+encodeURIComponent(Math.random()));document.getElementsByTagName('body')[0].appendChild(_readableScript);})()
+        "silent qmark r javascript:(function(){_readableOptions={'text_font':'Tinos','text_font_monospace':'quote(Courier%20New),%20Courier,%20monospace','text_font_header':'quote(Palatino%20Linotype),%20Palatino,%20quote(Book%20Antigua),%20Georgia,%20serif','text_size':'22px','text_line_height':'1.5','box_width':'40em','color_text':'#839496','color_background':'#002b36','color_links':'#268bd2','text_align':'normal','base':'blueprint','custom_css':'pre%20{%20background-color:%20#073642;%20}'};if(document.getElementsByTagName('body').length>0);else{return;}if(window.$readable){if(window.$readable.bookmarkletTimer){return;}}else{window.$readable={};}window.$readable.bookmarkletTimer=true;window.$readable.options=_readableOptions;if(window.$readable.bookmarkletClicked){window.$readable.bookmarkletClicked();return;}_readableScript=document.createElement('script');_readableScript.setAttribute('src','http://readable-static.tastefulwords.com/target.js?rand='+encodeURIComponent(Math.random()));document.getElementsByTagName('body')[0].appendChild(_readableScript);})()
+        " yahei
+        silent qmark r javascript:(function(){_readableOptions={'text_font':'Microsoft%20YaHei,%20Arial','text_font_monospace':'quote(Courier%20New),%20Courier,%20monospace','text_font_header':'quote(Palatino%20Linotype),%20Palatino,%20quote(Book%20Antigua),%20Georgia,%20serif','text_size':'20px','text_line_height':'1.5','box_width':'40em','color_text':'#839496','color_background':'#002b36','color_links':'#268bd2','text_align':'normal','base':'blueprint','custom_css':'pre%20{%20background-color:%20#073642;%20}'};if(document.getElementsByTagName('body').length>0);else{return;}if(window.$readable){if(window.$readable.bookmarkletTimer){return;}}else{window.$readable={};}window.$readable.bookmarkletTimer=true;window.$readable.options=_readableOptions;if(window.$readable.bookmarkletClicked){window.$readable.bookmarkletClicked();return;}_readableScript=document.createElement('script');_readableScript.setAttribute('src','http://readable-static.tastefulwords.com/target.js?rand='+encodeURIComponent(Math.random()));document.getElementsByTagName('body')[0].appendChild(_readableScript);})()
+    " }}}
+
+    " q for Quix {{{
+        silent qmark q javascript:Quix();function%20Quix(){var%20e=encodeURIComponent;var%20t=window.getSelection?window.getSelection():(document.getSelection?document.getSelection():(document.selection?document.selection.createRange().text:''));var%20c=window.prompt('Quix:%20Type%20`help`%20for%20a%20list%20of%20commands:');if(t!=''){if(c){c+='%20'+t;}else{c=''+t;}}if(c){var%20u='http://www.quixapp.com/go/?c='+e(c)+'&t='+(document.title?e(document.title):'')+'&s='+'&v=081'+'&u='+(document.location?e(document.location):'');d=''+document.location;if(d.substr(0,4)!='http'){window.location=u+'&mode=direct';}else{heads=document.getElementsByTagName('head');if(c.substring(0,1)=='%20'){var%20w=window.open(u+'&mode=direct');w.focus();}else%20if(heads.length==0){window.location=u+'&mode=direct';}else{q=document.getElementById('quix');if(q){q.parentNode.removeChild(q);}sc=document.createElement('script');sc.src=u;sc.id='quix';sc.type='text/javascript';void(heads[0].appendChild(sc));}}}}
+    " }}}
+
+    " a for aardvark {{{
+        "silent qmark a javascript:document.getElementsByTagName('head')[0].appendChild(document.createElement('script')).setAttribute('src','http://www.karmatics.com/aardvark/bookmarklet.js')
+        silent qmark a javascript:document.getElementsByTagName('head')[0].appendChild(document.createElement('script')).setAttribute('src','http://www.karmatics.com/aardvark/bookmarklet.js')
+    " }}}
+
+    " e for epubreader {{{
+        silent qmark e chrome://epubreader/content/catalog.xul
+    " }}}
+
+    " p for Pocket (Read It Later) {{{
+        silent qmark p javascript:(function(){ISRIL_H='bf8a';PKT_D='getpocket.com';ISRIL_SCRIPT=document.createElement('SCRIPT');ISRIL_SCRIPT.type='text/javascript';ISRIL_SCRIPT.src='http://'+PKT_D+'/b/r.js';document.getElementsByTagName('head')[0].appendChild(ISRIL_SCRIPT)})();
+
+    " t for toodledo {{{
+        silent qmark t http://www.toodledo.com/
+    " }}}
+" }}}
+
+" vim:ft=vimperator:fileencoding=utf-8:foldmethod=marker

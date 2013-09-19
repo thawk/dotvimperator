@@ -1,0 +1,8 @@
+[
+  {
+    "url":          "^http://www\\.(?:zasq\\.net|zazww\\.com)/.*thread.php",
+    "nextLink":     "//div[@class='pages']/b/following-sibling::a[position()<last()][1]",
+    "pageElement":  "id('c')/div[@class='sidePd10'",
+    "exampleUrl":   "http://www.zazww.com/thread.php?fid-17-page-54.html",
+  },
+]
