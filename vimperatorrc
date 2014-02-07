@@ -210,7 +210,10 @@ command! -nargs=* siteSearch execute "tabopen <args> site:" + window.content.loc
 "" hide all browser search engines except google(for suggestion)
 "js services.browserSearch.getEngines().forEach(function (e) {if(e.name!="Google") e.hidden = true})
 silent bmark -tags searchengine -folder searchengine -keyword g -title='Google SSL Search' https://www.google.com/search?q=%s&lr=lang_zh-CN|lang_zh-TW|lang_en
-silent bmark -tags searchengine -folder searchengine -keyword gc -title='Google Code Search' http://google.com/codesearch?q=%s
+"silent bmark -tags searchengine -folder searchengine -keyword gc -title='Google Code Search' http://google.com/codesearch?q=%s
+silent bmark -tags searchengine -folder searchengine -keyword code -title='Code Search (ohloh)' http://code.ohloh.net/search?s=%s
+silent bmark -tags searchengine -folder searchengine -keyword code1 -title='Code Search (searchcode.com)' http://searchcode.com/?q=%s
+silent bmark -tags searchengine -folder searchengine -keyword pan -title='网盘搜索' https://www.google.com/search?q=site:pan.baidu.com%20%s
 silent bmark -tags searchengine -folder searchengine -keyword b -title='Bing Search' http://cn.bing.com/search?q=%s
 silent bmark -tags searchengine -folder searchengine -keyword w -title='Wikipedia Search' http://en.wikipedia.org/wiki/Special:Search?search=%s
 silent bmark -tags searchengine -folder searchengine -keyword t -title='Twitter Search' https://twitter.com/search/%s
